@@ -2,7 +2,7 @@ spring:
   application:
     name: Food-Ordering-System
   datasource:
-    url: jdbc:mysql://localhost:3306/spring_security
+    url: jdbc:mysql://localhost:3306/food_ordering_system
     username: root
     password: Prasanna@5030
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,6 +15,20 @@ spring:
       show-sql: true
       database: mysql
       database-platform: org.hibernate.dialect.MySQL8Dialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: msprasannakumar19@gmail.com
+    password: ppcv upce yyta gxnz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 logging:
   level:
     org.springframework.security: TRACE
+
+

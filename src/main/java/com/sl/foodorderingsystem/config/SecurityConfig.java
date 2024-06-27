@@ -9,8 +9,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.Collection;
 
 import static com.sl.foodorderingsystem.entity.Permission.*;
 import static com.sl.foodorderingsystem.entity.Role.ADMIN;
@@ -45,5 +49,12 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+
+    public Boolean isAdmin(Authentication authentication){
+        Collection<? extends GrantedAuthority> authorities= authentication.getAuthorities();
+        return authorities.stream().anyMatch(authority-> authority.getAuthority().equals("ROLE_ADMIN"));
+    }
+
 
 }
