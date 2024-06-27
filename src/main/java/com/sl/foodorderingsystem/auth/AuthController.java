@@ -1,5 +1,6 @@
 package com.sl.foodorderingsystem.auth;
 
+import com.sl.foodorderingsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
@@ -32,4 +34,8 @@ public class AuthController {
         return ResponseEntity.ok(authService.authenticate(request));
     }
 
+    @PostMapping("/forgotpassword")
+    public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> requestMap){
+        return userService.forgotPassword(requestMap);
+    }
 }
