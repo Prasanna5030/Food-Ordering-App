@@ -11,6 +11,7 @@ import java.util.List;
 @Transactional
 @Repository
 public interface CategoryRepository extends JpaRepository<Category , Integer> {
-    @Query(value="select c from Category c")
+    //where c.id in (select p.category from Product p where p.status='true')"
+    @Query(value="select c from Category c ")
     List<Category> getAllCategory();
 }

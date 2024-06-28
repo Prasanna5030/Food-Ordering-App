@@ -1,5 +1,6 @@
 package com.sl.foodorderingsystem.service;
 
+import com.sl.foodorderingsystem.dto.CategoryDto;
 import com.sl.foodorderingsystem.entity.Category;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,4 +15,6 @@ public interface CategoryService {
     ResponseEntity<List<Category>> getAllCategory(String filterValue);
 
     ResponseEntity<String> updateCategory(Map<String, String> requestMap);
+
+    ResponseEntity<CategoryDto> getCategory(Integer id);
 }

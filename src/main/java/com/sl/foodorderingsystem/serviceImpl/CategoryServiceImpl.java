@@ -2,6 +2,7 @@ package com.sl.foodorderingsystem.serviceImpl;
 
 import com.google.common.base.Strings;
 import com.sl.foodorderingsystem.Repository.CategoryRepository;
+import com.sl.foodorderingsystem.dto.CategoryDto;
 import com.sl.foodorderingsystem.entity.Category;
 import com.sl.foodorderingsystem.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,20 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
         return new ResponseEntity<>("Category doesnt exist",HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public ResponseEntity<CategoryDto> getCategory(Integer id) {
+        Optional<Category> optional= categoryRepository.findById(id);
+        if(!optional.isEmpty()){
+            var categoryDto= CategoryDto.builder()
+                    .id(optional.get().getId())
+                    .Category(optional.get().getCategory())
+                    .build();
+            return new ResponseEntity<>(categoryDto,HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        }
     }
 
     private boolean validateCategoryMap(Map<String, String> requestMap, boolean validateId) {

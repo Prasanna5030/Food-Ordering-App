@@ -1,5 +1,6 @@
 package com.sl.foodorderingsystem.controller;
 
+import com.sl.foodorderingsystem.dto.CategoryDto;
 import com.sl.foodorderingsystem.entity.Category;
 import com.sl.foodorderingsystem.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,12 @@ public class CategoryController {
     @PreAuthorize("hasAnyAuthority('admin:read','admin:create')")
     public ResponseEntity<String> updateCategory(@RequestBody Map<String ,String> requestMap){
         return categoryService.updateCategory(requestMap);
+    }
+
+    @PostMapping("/getcategory/{id}")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'admin:create')")
+    public ResponseEntity<CategoryDto> getCategory(@PathVariable Integer id){
+        return categoryService.getCategory(id);
     }
 
 }
