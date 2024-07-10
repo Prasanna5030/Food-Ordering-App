@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+
+@CrossOrigin
 @RestController
 @RequestMapping("/home/category")
 @PreAuthorize("hasAnyRole('ADMIN')")
@@ -33,7 +35,7 @@ public class CategoryController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyAuthority('admin:read','admin:create')")
-    public ResponseEntity<List<Category>> getAllCategory(@RequestBody(required = false) String filterValue){
+    public ResponseEntity<List<Category>> getAllCategory(@RequestParam(required = false) String filterValue){
         return categoryService.getAllCategory(filterValue);
     }
 

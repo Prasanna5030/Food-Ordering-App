@@ -60,7 +60,7 @@ public class AuthService {
 
 
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> authenticate(AuthenticationRequest request) {
         //FirstStep
         //We need to validate our request (validate whether password & username is correct)
         //Verify whether user present in the database
@@ -71,12 +71,14 @@ public class AuthService {
         //Verify whether user present in db
         //generateToken
         //Return the token
-       Authentication auth= authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
 
 //       if(securityConfig.isAdmin(auth)){
 //           System.out.println("The user is admin  "+auth);
@@ -85,11 +87,23 @@ public class AuthService {
 //           System.out.println("The user is user"+auth);
 //
 //       }
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
-        String jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().accessToken(jwtToken).build();
 
+            if (auth.isAuthenticated()) {
+                var user = userRepository.findByEmail(request.getEmail());
+
+
+                String jwtToken = jwtService.generateToken(user.get());
+                var authResponse = AuthenticationResponse.builder().message("successfully logged in").accessToken(jwtToken).build();
+                return new ResponseEntity<>(authResponse, HttpStatus.OK);
+            } else {
+                var authResponse = AuthenticationResponse.builder().message("Invalid email or password").build();
+                return new ResponseEntity<>(authResponse, HttpStatus.BAD_REQUEST);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        var authResponse = AuthenticationResponse.builder().message("Invalid email or Password. please enter valid details").build();
+        return new ResponseEntity<>(authResponse, HttpStatus.BAD_REQUEST);
     }
 
     private RegisterRequest getUserFromMap(Map<String, String> requestMap) {

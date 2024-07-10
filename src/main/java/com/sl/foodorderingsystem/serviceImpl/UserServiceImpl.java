@@ -149,6 +149,11 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public ResponseEntity<String> checkToken() {
+       return new ResponseEntity<>("true",HttpStatus.OK);
+    }
+
 
 }
 

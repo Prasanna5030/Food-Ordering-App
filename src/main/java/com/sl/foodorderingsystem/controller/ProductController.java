@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/home/product")
 @PreAuthorize("hasAnyRole('ADMIN')")
@@ -33,19 +34,26 @@ public class ProductController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyAuthority('admin:read' ,'admin:create')")
-    public ResponseEntity<List<Product>> getAllProduct(@RequestParam(required = false) String filterValue ){
+    public ResponseEntity<List<ProductDto>> getAllProduct(@RequestParam(required = false) String filterValue ){
 
         return productService.getAllProducts(filterValue);
     }
 
+    @GetMapping("/productsbycategory/{id}")
+    @PreAuthorize("hasAnyAuthority('admin:read' ,'admin:create')")
+    public ResponseEntity<List<ProductDto>> getAllProductByCategoryId(@PathVariable Map<String, String> requestMap){
+
+        return productService.getAllProductsByCategoryId(requestMap);
+    }
+
     @PostMapping("/update")
     @PreAuthorize("hasAnyAuthority('admin:read' ,'admin:create')")
-    public ResponseEntity<String> getAllProduct(@RequestBody Map<String , String> requestMap){
+    public ResponseEntity<String> updateProduct(@RequestBody Map<String , String> requestMap){
 
         return productService.updateProduct(requestMap);
     }
 
-    @PostMapping("/product/{id}")
+    @GetMapping("/product/{id}")
     @PreAuthorize("hasAnyAuthority('admin:read', 'admin:create')")
     public ResponseEntity<ProductDto> getProductById(@PathVariable Integer id){
         return productService.getProductByid(id);

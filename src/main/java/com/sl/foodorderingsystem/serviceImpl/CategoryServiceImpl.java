@@ -5,6 +5,9 @@ import com.sl.foodorderingsystem.Repository.CategoryRepository;
 import com.sl.foodorderingsystem.dto.CategoryDto;
 import com.sl.foodorderingsystem.entity.Category;
 import com.sl.foodorderingsystem.service.CategoryService;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+
 @Service
 public class CategoryServiceImpl implements CategoryService {
+    private static final Logger log = LoggerFactory.getLogger(CategoryServiceImpl.class);
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -35,10 +40,14 @@ public class CategoryServiceImpl implements CategoryService {
     public ResponseEntity<List<Category>> getAllCategory(String filterValue) {
 
         if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")){
+            log.info("inside filter value is true");
             return new ResponseEntity<List<Category>>(categoryRepository.getAllCategory(),HttpStatus.OK);
+        }else {
+            log.info("inside filter value is false");
+            List<Category> categoryList = categoryRepository.findAll();
+
+            return ResponseEntity.ok(categoryList);
         }
-         List<Category> categoryList=categoryRepository.findAll();
-        return ResponseEntity.ok(categoryList);
     }
 
     @Override
@@ -72,7 +81,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private boolean validateCategoryMap(Map<String, String> requestMap, boolean validateId) {
 
-        if(requestMap.containsKey("name")){
+        if(requestMap.containsKey("category")){
             if(requestMap.containsKey("id")&& validateId){
                 return true;
             } else if (!validateId) {
@@ -88,7 +97,7 @@ public class CategoryServiceImpl implements CategoryService {
         if( isAdd){
             category.setId(Integer.parseInt(requestMap.get("id")));
         }
-        category.setCategory(requestMap.get("name"));
+        category.setCategory(requestMap.get("category"));
         return  category;
     }
 }

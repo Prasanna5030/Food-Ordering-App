@@ -1,5 +1,6 @@
 package com.sl.foodorderingsystem.Repository;
 
+import com.sl.foodorderingsystem.dto.ProductDto;
 import com.sl.foodorderingsystem.entity.Product;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,8 +15,13 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
 
-    @Query(value = "select new com.sl.foodorderingsystem.dto.ProductDto(p.id, p.productName, p.description, p.price, p.status , p.category.id, p.category.category) from Product  p")
-    List<Product> getAllProducts();
+    @Query(value = "select new com.sl.foodorderingsystem.dto.ProductDto(p.id, p.productName, p.description, p.price, p.status , p.category.id, p.category.category) from Product  p where p.status='true'")
+    List<ProductDto> getAllProducts();
+
+
+    @Query(value = "select new com.sl.foodorderingsystem.dto.ProductDto(p.id, p.productName, p.description, p.price, p.status , p.category.id, p.category.category) from Product  p where p.category.id=:id")
+    List<ProductDto> getAllProductsByCategoryId(@RequestParam("id") Integer id);
+
 
     @Modifying
     @Query(value="update Product p set p.status=:status where p.id=:id")

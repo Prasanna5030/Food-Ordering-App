@@ -9,10 +9,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
+@CrossOrigin
 @RestController
 @RequestMapping("/home/user")
-@PreAuthorize("hasAnyRole('USER')")
+@PreAuthorize("hasAnyRole('ADMIN','USER')")
 public class UserController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class UserController {
         return "Secured Endpoint :: user controller post";
     }
 
-    @PreAuthorize("hasAnyAuthority('user:read','user:create')")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'admin:create','user:read','user:create')")
     @PostMapping("/changepassword")
     public ResponseEntity<String> changePassword( @RequestBody Map<String, String> requestMap){
         return userService.changePassword(requestMap);

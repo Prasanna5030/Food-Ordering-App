@@ -1,6 +1,7 @@
 package com.sl.foodorderingsystem.serviceImpl;
 
 import com.google.common.base.Strings;
+import com.sl.foodorderingsystem.Repository.CategoryRepository;
 import com.sl.foodorderingsystem.Repository.ProductRepository;
 import com.sl.foodorderingsystem.dto.CategoryDto;
 import com.sl.foodorderingsystem.dto.ProductDto;
@@ -23,6 +24,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Override
     public ResponseEntity<Product> addNewProduct(Map<String , String> requestMap) {
@@ -55,18 +59,33 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<List<Product>> getAllProducts(String filterValue) {
+    public ResponseEntity<List<ProductDto>> getAllProducts(String filterValue) {
         try {
             if (!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")) {
-                return new ResponseEntity<List<Product>>(productRepository.getAllProducts(), HttpStatus.OK);
+                return new ResponseEntity<List<ProductDto>>(productRepository.getAllProducts(), HttpStatus.OK);
             } else {
-                new ResponseEntity<List<Product>>(productRepository.findAll(), HttpStatus.OK);
+                List<Product> products=productRepository.findAll();
+                List<ProductDto> productDtoList= products.stream().map(
+                        product -> ProductDto.builder()
+                                .id(product.getId())
+                                .productName(product.getProductName())
+                                .status(product.getStatus())
+                                .price(product.getPrice())
+                                .description(product.getDescription())
+                                .status(product.getStatus())
+                                .categoryId(product.getCategory().getId())
+                                .category(product.getCategory().getCategory())
+                                .build()).toList();
+
+return  new ResponseEntity<List<ProductDto>>(productDtoList, HttpStatus.OK);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
 
         }
-        return new ResponseEntity<List<Product>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return  new ResponseEntity<List<ProductDto>>((List<ProductDto>) null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
@@ -133,21 +152,41 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    public ResponseEntity<List<ProductDto>> getAllProductsByCategoryId(Map<String, String> requestMap) {
+        try {
+            List<ProductDto> productDtoList=productRepository.getAllProductsByCategoryId(Integer.parseInt(requestMap.get("id")));
+
+            if(!productDtoList.isEmpty()) {
+                return new ResponseEntity<>(productDtoList, HttpStatus.OK);
+            }else{
+                return new ResponseEntity<List<ProductDto>>(new ArrayList<>(), HttpStatus.NOT_FOUND);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<List<ProductDto>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     private Product getProductFromMap(Map<String, String> requestMap, boolean isAdd) {
-        Category category = Category.builder()
-                .id(Integer.parseInt(requestMap.get("categoryId"))).build();
-        Product product = new Product();
-        if(isAdd){
-            product.setId(Integer.parseInt(requestMap.get("id")));
-        } else{
-            product.setStatus("true");
-        }
-        product.setCategory(category);
-        product.setProductName( requestMap.get("productName"));
-        product.setDescription(requestMap.get("description"));
-        product.setPrice(Float.parseFloat(requestMap.get("price")));
-        return  product;
+        Optional<Category> category= categoryRepository.findById(Integer.valueOf(requestMap.get("categoryId")));
+       if(category.isPresent()) {
+
+           Product product = new Product();
+           if (isAdd) {
+               product.setId(Integer.parseInt(requestMap.get("id")));
+           } else {
+               product.setStatus("true");
+           }
+           product.setCategory(category.get());
+           product.setProductName(requestMap.get("productName"));
+           product.setDescription(requestMap.get("description"));
+           product.setPrice(Float.parseFloat(requestMap.get("price")));
+           return product;
+       }else{
+           throw new RuntimeException("Category Not Found");
+       }
     }
 
     private boolean validateProductMap(Map<String, String> requestMap, boolean validateId) {
