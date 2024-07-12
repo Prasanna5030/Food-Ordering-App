@@ -1,0 +1,55 @@
+
+
+services:
+  cafe-resto-frontend:
+    image: cafe-resto:1.0
+    container_name: cafe-resto
+    ports:
+      - '4200:4200'
+    depends_on:
+      - food-ordering-app
+    networks:
+      - app-network
+
+
+  food-ordering-app:
+    image: food-ordering-app:1.0
+    container_name: food-ordering-app
+    ports:
+      - '8080:8080'
+    environment:
+      MYSQL_PORT: 3306
+      MYSQL_HOST: mysqldb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+    restart: on-failure
+    volumes:
+      - .m2:/root/.m2
+    depends_on:
+      - mysqldb
+    networks:
+      - app-network
+
+  mysqldb:
+    image: mysql:8.4.0
+    container_name: mysqldb
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: food_ordering_system
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysqldbdata:/var/lib/mysql
+    restart: unless-stopped
+
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysqldbdata:
